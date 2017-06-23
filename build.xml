@@ -1,0 +1,1067 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="CUEPrepAndRating" basedir="../" default="autobuild" xmlns:cs="antlib:com.urbancode.codestation2.client">
+	<!-- project-specific variables -->
+	<property file="${basedir}/build/build.properties" />
+	<property file="${basedir}/build/buildnumber.properties" />
+
+	<property name="app.name" value="CUEPrepAndRating"/>
+	<property name="deployRoot_Tomcat" value="${localStageDir_Tomcat}/${app.name}" />
+	<property name="build.dir" value="build"/>
+	<property name="codestation" value="https://ahp.thehartford.com"/>
+	<property name="sdkversion" value="4.6.003.00083"/>
+
+	<property name="web.dir" value="web"/>
+	<property name="lib.dir" value="lib"/>
+	<property name="classes.dir" value="classes"/>
+	<property name="src.dir" value="src"/>
+	<property name="srcrootHijacked.dir" value="src_APSDK_${sdkversion}"/>
+	<property name="stage.dir" value="stage"/>
+	<property name="webroot" value="${basedir}/web" />
+	<!-- Directories where library jars are pulled from AHP -->
+	<property name="apsdk.dir" value="APSDK_4.6.003.00083"/>
+	<property name="aptemplatecore.dir" value="AP_template_core_4.6.003.00065"/>
+	<property name="agencyconnect.dir" value="AHPLibs/AgencyConnect"/>
+	<property name="aptemplatecore.patch.dir" value="AHPLibs/AP_template_core/patch_4.6.004.00138"/>
+	<property name="spring.dir" value="AHPLibs/Spring"/>
+	<property name="aspectj.dir" value="AHPLibs/AspectJ"/>
+	<property name="axis2.dir" value="AHPLibs/Axis2"/>
+	<property name="xmlschema.dir" value="AHPLibs/XMLSchema"/>
+	<property name="apache.dir" value="AHPLibs/Apache"/>
+	<property name="junit.dir" value="AHPLibs/JUnit"/>
+	<property name="javax.dir" value="AHPLibs/Javax"/>
+	<property name="saxon.dir" value="AHPLibs/Saxon"/>
+	<property name="wrappers.dir" value="AHPLibs/Wrappers"/>
+	<property name="cueshared.dir" value="AHPLibs/CueShared"/>
+	<!-- Directories where library jars are copied to categorized folders under lib directory  -->
+	<property name="lib.dir.APSDK" value="${lib.dir}/APSDK"/>
+	<property name="lib.dir.agencyconnect" value="${lib.dir}/APSDK"/>
+	<property name="lib.dir.Axis2" value="${lib.dir}/Axis2"/>
+	<property name="lib.dir.Spring" value="${lib.dir}/Spring"/>
+	<property name="lib.dir.AspectJ" value="${lib.dir}/AspectJ"/>
+	<property name="lib.dir.XMLSchema" value="${lib.dir}/XMLSchema"/>
+	<property name="lib.dir.Apache" value="${lib.dir}/Apache"/>
+	<property name="lib.dir.sharedservices" value="${lib.dir}/sharedservices"/>
+	<property name="lib.dir.Javax" value="${lib.dir}/Javax"/>
+	<property name="lib.dir.JUnit" value="${lib.dir}/JUnit"/>
+	<property name="lib.dir.Saxon" value="${lib.dir}/Saxon"/>
+	<property name="lib.dir.Wrappers" value="${lib.dir}/Wrappers"/>
+	<property name="lib.dir.CueShared" value="${lib.dir}/CueShared"/>
+	
+	<!-- JUNIT properties -->
+	<property name="reports.dir" value="${basedir}/reports" />
+	<condition property="junit.reports.dir" value="${reports.dir}/junit" else="${basedir}/test/output/junit">
+		<not>
+			<isset property="sdf_sourcelocation" />
+		</not>
+	</condition>
+	<property name="junit.reports.xml.dir" value="${junit.reports.dir}/xml" />
+	<property name="junit.reports.html.dir" value="${junit.reports.dir}/html" />
+	<property name="junit.file" value="junit-4.12.jar" />
+	<property name="junit.test.dir" value="${basedir}/unitTest" />
+	<property name="junit.classes.dir" value="${basedir}/testclasses" />
+		<!-- Cobertura properties -->
+	<condition property="cobertura.reports.dir" value="${reports.dir}/cobertura" else="${basedir}/test/output/cobertura">
+		<not>
+			<isset property="sdf_sourcelocation" />
+		</not>
+	</condition>
+	<property name="cobertura.instrument.classes.dir" value="${cobertura.reports.dir}/instrumented-classes" />
+	<property name="cobertura.coverage.html.dir" value="${cobertura.reports.dir}/html" />
+	<property name="cobertura.ser" value="${cobertura.reports.dir}/cobertura.ser" />
+	<property name="cobertura.lib.dir" value="${lib.dir}/cobertura" />
+
+	<!-- DSL build directories -->
+	<!--<property name="componentDir" value="//ad1.prod/hig/PL/eBT/SDF/DSL"/>-->
+    <!--<property name="sharedServicesIM.dir" value="${componentDir}/bi_nbv_im_3rdparty_svc_clients/trunk_latest" />-->
+	<!--<property name="sharedServicesClients.dir" value="${componentDir}/bi_nbv_misc_svc_clients/branches_R3_Auto_misc_svc_clients_latest" />-->
+	<!--<property name="ratingServicesClients.dir" value="${componentDir}/bi_nbv_uwq_rate_price_svc_clients/trunk_73" />-->
+	<!--<property name="eppServiceClients.dir" value="${componentDir}/bi_nbv_ebpp_svc_clients/trunk_18" />-->
+	<!--<property name="siebelServiceClients.dir" value="${componentDir}/bi_nbv_siebel_svc_clients/trunk_17" />-->
+	<!--<property name="cdrServiceClients.dir" value="${componentDir}/bi_nbv_cdr_service_clients/trunk_20" />-->
+	<!--<property name="acctmgmt.svc.libdir" value="${componentDir}/bi_nbv_acct_mgmt_svc_clients/trunk_22" />-->
+	<!--<property name="bpel.svc.libdir" value="${componentDir}/bi_nbv_bpel_svc_clients/trunk_23" />-->
+	<!--<property name="serviceWrapper.dir" value="${componentDir}/bi_nbv_misc_svc_clients/branches_CUE_POC_misc_svc_clients_latest" />-->
+	
+	<!-- put everything in a temp folder with the right structure during the build -->
+	<property name="temp.dir" value="temp"/>
+	<property name="temp.dir.web-inf" value="${temp.dir}/WEB-INF"/>
+	<property name="temp.web.classes.dir" value="${temp.dir.web-inf}/classes"/>
+	<property name="temp.web.lib.dir" value="${temp.dir.web-inf}/lib"/>
+	<property name="temp.dir.meta-inf" value="${temp.dir}/META-INF"/>
+
+	<tstamp>
+		<format property="buildDate" pattern="yyyy-MM-dd HH:mm:ss" />
+		<format property="buildDateCompact" pattern="yyyyMMdd_HHmmss" />
+	</tstamp>
+
+	<condition property="weblogic.jar.dir" value="${sdf_weblogic_10.3.6}/wlserver_10.3/server/lib" else="${local.weblogic.home}/wlserver_10.3/server/lib">
+		<isset property="sdf_build"/>
+	</condition>
+
+	<condition property="implementationversion" value="${sdf_revision}" else="V${DSTAMP}${TSTAMP}">
+		<isset property="sdf_revision" />
+	</condition>
+
+	<!-- determine whether the build is run locally or from the DSl and set some parameters-->
+	<target name="versioncheck">
+		<condition property="implementationversion" value="${sdf_revision}" else="V${DSTAMP}${TSTAMP}">
+			<isset property="sdf_revision" />
+		</condition>
+
+		<condition property="stageDir" value="${basedir}/stage" else="${localStageDir_WL}">
+			<isset property="sdf_revision" />
+		</condition>
+
+		<condition property="deployRoot" value="${basedir}/stage/${webAppName}" else="/${stageDir}/${webAppName}">
+			<isset property="sdf_revision" />
+		</condition>
+
+		<echo message="Implementation-Version is ${implementationversion}" />
+		<echo message="stageDir is ${stageDir}" />
+		<echo message="deployRoot is ${deployRoot}" />
+	</target>
+
+	<filterchain id="buildInfoFilter">
+		<tokenfilter>
+			<linetokenizer />
+			<replaceregex pattern="^BUILD_DATE=.*$" replace="BUILD_DATE=${buildDate}" />
+			<replaceregex pattern="^BUILD_ID=.*$" replace="BUILD_ID=${implementationversion}" />
+			<replaceregex pattern="^RELEASE_DATE=.*$" replace="RELEASE_DATE=${release.date}"/>
+		</tokenfilter>
+	</filterchain>
+
+	<path id="build.class.path">
+		<fileset dir="${basedir}/${lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${weblogic.jar.dir}">
+			<include name="weblogic.jar"/>
+		</fileset>
+	</path>
+
+	<!-- Remove staging directories -->
+	<target name="clean">
+		<echo>Cleaning stage/temp/classes directories for build .... BEGIN</echo>
+		<delete dir="${temp.dir}"/>
+		<delete dir="${stage.dir}"/>
+		<delete dir="${classes.dir}"/>
+		<echo>Cleaning stage/temp/classes directories for build .... END</echo>
+	</target>
+
+	<!-- download libraries and AP SDK from codestation -->
+	<target name="-resolve" unless="sdf_build">
+		<echo>Getting libraries from AHP Codestation ..... BEGIN</echo>
+		<cs:resolve server="${codestation}"
+				authToken="Guest-Auth"
+				basedir="${basedir}"
+				xmlFile="${basedir}/build/dependencies.xml"
+				noCheckCertificate="true"
+				noCache="false"
+				suppressBoms="true"
+				verbose="true" 
+				noverify="true"/>
+		<echo>Getting libraries from AHP Codestation ..... END</echo>
+	</target>
+
+	<!-- Make staging folders -->
+	<target name="prepare">
+		<echo>Create stage/temp directories for build .... BEGIN</echo>
+		<mkdir dir="${stage.dir}"/>
+		<mkdir dir="${temp.dir}"/>
+		<echo>Create stage/temp directories for build .... END</echo>
+	</target>
+
+
+	<!-- Copy JARS -->
+	<target name="copylibs">
+		<echo>Copying the Libraries ..... BEGIN</echo>
+		<mkdir dir="${lib.dir}"/>
+
+		<echo>Copying APSDK Libraries ...</echo>
+		<copy todir="${lib.dir.APSDK}" verbose="true" failonerror="true">
+			<fileset dir="${apsdk.dir}">
+				<include name="**/*.jar"/>
+				<exclude name="**/saaj.jar" />
+				<exclude name="**/geronimo*.jar" />
+			</fileset>
+			<fileset dir="${aptemplatecore.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${aptemplatecore.patch.dir}">
+				<include name="**/apintkit-clientapi.jar"/>
+			</fileset>
+			<!--<fileset dir="${solr.dir}">
+				<include name="**/*.jar"/>
+			</fileset>-->
+			<flattenmapper/>
+		</copy>
+
+		 	<echo>Copying Agency Connect Libraries ...</echo>
+		<!-- copy Agency Connect jars -->
+		<copy todir="${lib.dir.agencyconnect}" verbose="true" failonerror="true">
+			<fileset dir="${agencyconnect.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+			<flattenmapper/>
+		</copy>
+
+		<echo>Copying Axis Libraries ...</echo>
+		<!-- copy Axis2 jars -->
+		<copy todir="${lib.dir.Axis2}" verbose="true" failonerror="true">
+			<fileset dir="${axis2.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+			<flattenmapper/>
+		</copy>
+
+		<echo>Copying Spring Libraries ....</echo>
+		<!-- copy Spring jars -->
+		<copy todir="${lib.dir.Spring}" verbose="true" failonerror="true">
+			<fileset dir="${spring.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+			<flattenmapper/>
+		</copy>
+
+		<echo>Copying AspectJ Libraries ....</echo>
+		<!-- copy AspectJ jars -->
+		<copy todir="${lib.dir.AspectJ}" verbose="true" failonerror="true">
+			<fileset dir="${aspectj.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+			<flattenmapper/>
+		</copy>
+
+		<echo>Copying XMLSchema Libraries ....</echo>
+		<!-- copy XMLSchema jars -->
+		<copy todir="${lib.dir.XMLSchema}" verbose="true" failonerror="true">
+			<fileset dir="${xmlschema.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+			<flattenmapper/>
+		</copy>
+		
+		<echo>Copying Apache Libraries ....</echo>
+		<!-- copy CommonsLang jars -->
+		<copy todir="${lib.dir.Apache}" verbose="${verbose}" failonerror="true">
+			<fileset dir="${apache.dir}">
+							<include name="**/*.jar"/>
+			</fileset>
+			<flattenmapper/>
+		</copy>
+
+		
+		<echo>Copying JUnit libraries ....</echo>
+		<!-- Copy JTA jars -->
+		<copy todir="${lib.dir.JUnit}" verbose="${verbose}" failonerror="true">
+					<fileset dir="${junit.dir}">
+						<include name="**/*.jar" />
+					</fileset>
+					<flattenmapper/>
+		</copy>
+
+		<echo>Copying Javax libraries ....</echo>
+		<!-- Copy Javax jars -->
+		<copy todir="${lib.dir.Javax}" verbose="true" failonerror="true">
+			<fileset dir="${javax.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>
+
+		<!-- Copy Saxon9 jars -->
+		<echo>Copying Saxon9 Libraries ....</echo>
+		<copy todir="${lib.dir.Saxon}" verbose="true" failonerror="true" >
+			<fileset dir="${saxon.dir}">
+				<include name="**/saxon9-dom.jar" />
+				<include name="**/saxon9-jdom.jar" />
+				<include name="**/saxon9.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>
+	
+		<echo>Copying NBV Wrapper libraries ....</echo>
+		<!-- Copy NBV Wrapper jars -->
+		<copy todir="${lib.dir.Wrappers}" verbose="true" failonerror="true">
+			<fileset dir="${wrappers.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>
+			
+
+		<echo>Copying MVR Auth Service Libraries ....</echo>
+		<!-- copy MVR Auth services jars -->
+		<!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true">
+			<fileset dir="${sharedServicesIM.dir}">
+				<include name="**/generated_BI_MVRAuth.jar" />
+				<include name="**/BI_MVRAuth.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy> -->
+
+		<echo>Copying MVR Service Libraries ....</echo>
+		<!-- copy MVR services jars -->
+		<!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true">
+			<fileset dir="${sharedServicesIM.dir}">
+				<include name="**/generated_MVRService.jar" />
+				<include name="**/MVRService.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>-->
+
+		<echo>Copying Trillium Service Libraries ....</echo>
+		<!-- copy Trillium services jars -->
+				<!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true">
+			<fileset dir="${sharedServicesIM.dir}">
+				<include name="**/generated_TrilliumService.jar" />
+				<include name="**/TrilliumService.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>-->
+
+		
+		<echo>Copying CLAQuoteIssueService Libraries ....</echo>
+		<!-- copy CLAQuoteIssueService jars -->
+		<!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true" overwrite="true">
+			<fileset dir="${ratingServicesClients.dir}">
+				<include name="**/generated_CLAQuoteIssueService.jar" />
+				<include name="**/CLAQuoteIssueService.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>-->
+
+		<echo>Copying Service Schema/Wrapper Libraries ....</echo>
+		<!-- copy Services Clients jars -->
+		 <!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true" overwrite="true">
+			<fileset dir="${sharedServicesClients.dir}">
+				<include name="**/generated_NBVServiceSchemas.jar" />
+				<include name="**/NBVServiceSchemas.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>-->
+
+        <echo>Copying Account Services Libraries ....</echo>
+		<!-- copy Account Services jars -->
+		<!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true" overwrite="true">
+			<fileset dir="${acctmgmt.svc.libdir}">
+				<include name="**/BI_AccountService.jar" />
+				<include name="**/generated_BI_AccountService.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>-->
+		
+		<echo>Copying Tax Code Service Libraries ....</echo>
+				<!-- copy Tax Code service jars -->
+				<!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true" overwrite="true">
+					<fileset dir="${sharedServicesIM.dir}">
+						<include name="**/generated_TaxCodeAssignmentService.jar" />
+						<include name="**/TaxCodeAssignmentService.jar" />
+					</fileset>
+					<flattenmapper/>
+		</copy>-->
+
+		<echo>Copying Territory Lookup Service Libraries ....</echo>
+		<!-- copy Territory Lookup service jars -->
+		<!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true" overwrite="true">
+			<fileset dir="${ratingServicesClients.dir}">
+				<include name="**/generated_BI_TerritoryLookup.jar" />
+				<include name="**/BI_TerritoryLookup.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>-->
+
+		<echo>Copying BI_RatingDetail Service Libraries ....</echo>
+		<!-- copy Rating Detail service jars -->
+		<!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true" overwrite="true">
+			<fileset dir="${ratingServicesClients.dir}">
+				<include name="**/generated_BI_RatingDetail.jar" />
+				<include name="**/BI_RatingDetail.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>-->
+		
+		<echo>Copying BI_Experience Rating Service Libraries ....</echo>
+		<!-- copy Experience Rating service jars -->
+		<!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true" overwrite="true">
+			<fileset dir="${ratingServicesClients.dir}">
+				<include name="**/generated_BI_ExperienceRating.jar" />
+				<include name="**/BI_ExperienceRating.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>-->
+
+		
+		<!-- Copy bi_mm_cue_ap_portal_shared JAR -->
+		<echo>Copying bi_mm_cue_ap_portal_shared JAR ....</echo>
+		<copy todir="${lib.dir.CueShared}" verbose="true" failonerror="true">
+			<fileset dir="${cueshared.dir}">
+				<include name="**/CUEAgencyPortalShared.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>
+		<echo>Copying the Libraries ..... END</echo>
+		
+		<!-- Copy ServiceWrapper JAR -->
+		<echo>Copying bi_mm_cue_ap_portal_shared JAR ....</echo>
+		<!--<copy todir="${lib.dir.sharedservices}" verbose="true" failonerror="true">
+			<fileset dir="${serviceWrapper.dir}">
+				<include name="**/ServiceWrappers.jar" />
+			</fileset>
+			<flattenmapper/>
+		</copy>-->
+		<echo>Copying the Libraries ..... END</echo>
+	</target>
+
+	<!-- COMPILE -->
+	<target name="compile" depends="copylibs" >
+		<echo>Compiling CUE Portal Classes ..... BEGIN</echo>
+		<echo>Weblogic jar location: ${weblogic.jar.dir}</echo>
+		<mkdir dir="${classes.dir}"/>
+		<mkdir dir="${classes.dir}/META-INF"/>
+		<echo>Compiling ${src.dir} files ...</echo>
+		<javac debug="on"  destdir="${classes.dir}" includes="**/*" encoding="Cp1252">
+			<src path="${src.dir}"/>
+			<src path="${srcrootHijacked.dir}"/>
+			<classpath refid="build.class.path"/>
+		</javac>
+		<!-- Copy META-INF files from src to classes -->
+		<copy todir="${classes.dir}/META-INF" verbose="true">
+			<fileset dir="${src.dir}/META-INF" >
+			</fileset>
+		</copy>
+		<echo>Compiling CUE Portal Classes ..... END</echo>
+	</target>
+
+	<!-- Stage Web Files -->
+	<target name="stagewebfiles">
+		<echo>Copying the CUE Web files to temp staging directory ..... BEGIN</echo>
+		<copy todir="${temp.dir}" verbose="true" overwrite="true">
+			<fileset dir="${web.dir}">
+			</fileset>
+		</copy>
+		<echo>Copying the CUE Web files to temp staging directory ..... END</echo>
+	</target>
+	
+	<target name="deployChangedFilesOnly">
+			<copy todir="${deployRoot_Tomcat}" verbose="true">
+				<fileset dir="${webroot}">
+					<!-- Note we do property files separately to insert the buildId stuff -->
+					<!-- exclude name="**/*.properties"/ -->
+				</fileset>
+			</copy>		
+	</target>
+
+	<target name="stagexmlfiles">
+		<echo>Copying the CUE XML files to temp staging directory ..... BEGIN</echo>
+		<copy todir="${temp.dir}" verbose="true" overwrite="true">
+			<fileset dir="${web.dir}">
+				<include name="**/*.xml" />
+				<exclude name="**/productDatabase.xml" />
+				<exclude name="**/web.xml" />
+				<exclude name="**/weblogic.xml" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="stagepropertyfiles">
+		<echo>Copying the CUE Property files to temp staging directory ..... BEGIN</echo>
+		<copy todir="${temp.dir}" verbose="true" overwrite="true" filtering="true">
+			<fileset dir="${web.dir}">
+				<include name="**/*.properties" />
+				<include name="**/productDatabase.xml" />
+				<include name="**/web.xml" />
+				<include name="**/weblogic.xml" />
+			</fileset>
+			<filterchain refid="buildInfoFilter" />
+		</copy>
+	</target>
+
+	<target name="stagejspfiles">
+		<echo>Copying the CUE JSP files to temp staging directory ..... BEGIN</echo>
+		<copy todir="${temp.dir}" verbose="true" overwrite="true">
+			<fileset dir="${web.dir}">
+				<include name="**/*.jsp"/>
+			</fileset>
+		</copy>
+		<echo>Copying the CUE Web files to temp staging directory ..... END</echo>
+	</target>
+
+	<!-- Stage Classes -->
+	<target name="stageclasses">
+		<echo>Copying the CUE Classes to temp staging directory ..... BEGIN</echo>
+		<copy todir="${temp.web.classes.dir}" verbose="true" overwrite="true">
+			<fileset dir="${classes.dir}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<echo>Copying the CUE Classes to temp staging directory ..... END</echo>
+	</target>
+
+	<!-- Stage Libs -->
+	<target name="stagelibs">
+		<echo>Copying the CUE Libraries to temp staging directory ..... BEGIN</echo>
+		<mkdir dir="${temp.web.lib.dir}"/>
+		<copy todir="${temp.web.lib.dir}" verbose="true" overwrite="true">
+			<fileset dir="${lib.dir}">
+				<exclude name="**/*_src.jar"/>
+				<exclude name="**/junit-4.10.jar"/>
+				<include name="**/*.jar" />
+				<!-- Excluded if we are using tomcat -->
+				<exclude name="**/javax.servlet*.jar" if="${tomcat}" />
+				<exclude name="**/javax.jsp*.jar" if="${tomcat}" />
+			</fileset>
+			<flattenmapper/>
+		</copy>
+		<echo>Copying the CUE Libraries to temp staging directory ..... END</echo>
+	</target>
+
+
+	<!-- autobuild, default target, packages the war file -->
+	<target name="autobuild" depends="-resolve, clean, prepare, compile, stagewebfiles, stageclasses, stagelibs">
+		<tstamp/>
+		<!-- with all resources in place, create the war file -->
+		<war destfile="${stage.dir}/${app.name}.war" basedir="${temp.dir}" webxml="${temp.dir}/WEB-INF/web.xml"  >
+			<manifest>
+				<attribute name="Implementation-Title" value="Commercial Auto Web Archive" />
+				<attribute name="Implementation-Vendor" value="TheHartford" />
+
+				<attribute name="Implementation-Version" value="${implementationversion}" />
+				<attribute name="Implementation-BuildDt" value="V${DSTAMP}${TSTAMP}" />
+				<attribute name="Implementation-Tag" value="${agencyportal.buildnumber}" />
+								
+				<attribute name="SVN-Build_Stamp" value="${sdf_build_stamp}" />
+				<attribute name="SVN-Revision" value="${sdf_revision}" />
+				<attribute name="SVN-Location" value="${sdf_sourcelocation}" />
+				<!--<attribute name="Class-Path" value="${jar.classpath}"/>-->
+			</manifest>
+		</war>
+		<echo>DEFAULT AntHillPro autobuild is COMPLETE</echo>
+	</target>
+	
+	
+
+	<!-- Build locally once the SDK web files have been pulled to the local machine -->
+	<target name="Weblogic_Local_Build" depends="clean, prepare, compile, stagewebfiles, stageclasses,stagelibs">
+		<echo>Local Build for Weblogic Server .... BEGIN</echo>
+		<echo>Cleans, Compiles, Prepare temp stage directory, builds the war file and Deploys to Weblogic Server</echo>
+
+		<tstamp/>
+		<!-- with all resources in place, create the war file -->
+		<!--
+		<war destfile="${stage.dir}/${app.name}.war" basedir="${temp.dir}" webxml="${temp.dir}/WEB-INF/web.xml">
+		</war>
+		<antcall target="Weblogic_Redeploy" />
+		-->
+		<antcall target="deploy_wl" />
+		<echo>Local Build for Weblogic Server .... END</echo>
+	</target>
+
+	<target name="deploy_wl" depends="versioncheck,deployWeb" description="deploy the application in exploded runtime format">
+	</target>
+
+	<target name="deployClasses" depends="versioncheck,compile">
+		<!-- Copy   C L A S S E S  -->
+		<copy todir="${deployRoot}/WEB-INF/classes" verbose="true">
+			<fileset dir="${basedir}/classes/">
+				<include name="**/*.class" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="deployLibs" depends="versioncheck,stagelibs">
+		<!-- Copy   C L A S S E S  -->
+		<copy todir="${deployRoot}/WEB-INF/lib" verbose="true">
+			<fileset dir="${temp.web.lib.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="deployWeb" depends="versioncheck">
+		<copy todir="${deployRoot}" verbose="true">
+			<fileset dir="${temp.dir}">
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="Weblogic_Full_Build" depends="-resolve, clean, prepare, compile, stagewebfiles, stageclasses, stagelibs">
+		<echo>Full Build for Weblogic Server .... BEGIN</echo>
+		<echo>Pulls Libraries from AHP, Cleans, Compiles, Prepare temp stage directory, builds the war file and Deploys to Weblogic Server</echo>
+
+		<tstamp/>
+		<!-- with all resources in place, create the war file -->
+		<war destfile="${stage.dir}/${app.name}.war" basedir="${temp.dir}" webxml="${temp.dir}/WEB-INF/web.xml">
+		</war>
+		<antcall target="Weblogic_Redeploy" />
+		<echo>Full Build for Weblogic Server .... END</echo>
+		<antcall target="clean_temp_dir" />
+	</target>
+
+	<target name="Weblogic_Redeploy">
+		<!--
+			When hot deploying to Weblogic, delete the war file first.
+			Then copy the new war file to a TEMP file so that Weblogic does not try to redeploy
+			when it is not copied fully. Once the copy is done, then rename the TEMP file to deployable war file  
+		-->
+		<delete file="${localStageDir_WL}/${app.name}.war" />
+		<copy file="${stage.dir}/${app.name}.war" tofile="${localStageDir_WL}/${app.name}.war.tmp" />
+		<move file="${localStageDir_WL}/${app.name}.war.tmp" tofile="${localStageDir_WL}/${app.name}.war" />
+	</target>
+
+	<target name="Weblogic_Delta_Classes" depends="versioncheck, compile, stageclasses">
+		<copy todir="${deployRoot}/WEB-INF/classes" verbose="true">
+			<fileset dir="${temp.web.classes.dir}">
+				<include name="**/*.class"/>
+			</fileset>
+		</copy>
+		<antcall target="clean_temp_dir" />
+	</target>
+
+	<!-- This only copies the xml files for the LOBs, no configuration xml files -->
+	<target name="Weblogic_Delta_XML" depends="versioncheck, compile, stagexmlfiles">
+		<copy todir="${deployRoot}" verbose="true">
+			<fileset dir="${temp.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+				<exclude name="**/web.xml" />
+				<exclude name="**/productDatabase.xml" />
+				<exclude name="**/weblogic.xml" />
+			</fileset>
+		</copy>
+		<antcall target="clean_temp_dir" />
+	</target>
+	
+	<!-- This copies all of the property/configuration files -->
+	<target name="Weblogic_Delta_Properties" depends="versioncheck, compile, stagepropertyfiles">
+			<copy todir="${deployRoot}" verbose="true">
+				<fileset dir="${temp.dir}">
+					<include name="**/*.properties"/>
+					<include name="**/productDatabase.xml" />
+					<include name="**/web.xml" />
+					<include name="**/weblogic.xml" />
+				</fileset>
+			</copy>
+			<antcall target="clean_temp_dir" />
+	</target>
+
+	<!--<target name="manifest">
+		<echo message="deploy root=${temp.dir}" />
+		<path id="abc.classpath">
+			<pathelement path="${temp.dir}/WEB-INF/lib/xmlbeans-2.3.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_CUEServiceSchemas.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/accommon.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/accore.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/activation.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apaccount.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apacord.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apbase.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apcore_rbs.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apdashboard.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apdataservices.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apinikit-ria-upload.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apintkit-clientapi.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apintkit-ria.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apmenutags.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apperf.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apresources.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apsecurity.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apsecurityreference.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/aptemplatecore.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/aptoolkittags.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apwebapp.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/apworklist.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/arcrule.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/aspectjrt.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/aspectjtools.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/axiom-api-1.2.8.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/axiom-dom-1.2.8.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/axiom-impl-1.2.8.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/axis.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/axis2-adb-1.5.1.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/axis2-kernel-1.5.1.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/axis2-transport-http-1.5.1.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/axis2-transport-local-1.5.1.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/bfopdf.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_AccountService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_ClassByType.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_InsuranceScore.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_MMAccountSearch.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_MMAccountView.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_MMQuoteProposalOrch.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_MVRAuth.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_PackageRating.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_SearchSpectrumISOGLClass.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_TerritoryLookup.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_UnderwritingAction.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/BI_UWPolicyExternalClearance.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/CLAQuoteIssueService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/commons-codec-1.7.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/commons-fileupload-1.2.1.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/commons-httpclient-3.1.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/commons-io-2.1.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/commons-lang-2.6.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/commons-logging-1.1.3.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/CPIDProducerCodeAssociation.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/CUEAgencyPortalShared.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/CUEServiceSchemas.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/CUEServiceWrappers.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/dom4j-1.6.1.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/fontbox-1.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_AccountService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_ClassByType.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_InsuranceScore.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_MMAccountSearch.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_MMAccountView.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_MMQuoteProposalOrch.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_MVRAuth.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_PackageRating.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_SearchSpectrumISOGLClass.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_TerritoryLookup.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_UnderwritingAction.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_BI_UWPolicyExternalClearance.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_CLAQuoteIssueService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_CPIDProducerCodeAssociation.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_MVRService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_NBVServiceSchemas.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_TaxCodeAssignmentService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_TrilliumService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_UnifiedProfile.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_VIDOrchestration.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_VidPopulateHfdService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_VIDSMultiple.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_VINPrefillService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/generated_WorkbinProducerCodes.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/guava-14.0.1.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/httpclient-4.2.3.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/httpcore-4.2.2.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/jakarta-regexp-1.5.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/jaxen-1.1.1.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/jdom.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/json.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/jstl.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/log4j-over-slf4j-1.6.6.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-analyzers-common-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-analyzers-kuromoji-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-analyzers-phonetic-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-codecs-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-core-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-grouping-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-highlighter-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-memory-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-misc-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-queries-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-queryparser-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-spatial-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/lucene-suggest-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/mail.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/MVRService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/NBVServiceSchemas.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/neethi-2.0.4.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/noggit-0.5.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/pdfbox-1.8.3.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/poi-3.7.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/poi-ooxml-3.7.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/poi-ooxml-schemas-3.7.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/relaxngDatatype.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/saxon9-dom.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/saxon9-jdom.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/saxon9.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/serializer.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/servlet-api.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/slf4j-api-1.6.6.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/slf4j-jdk14-1.6.6.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/solr-core-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/solr-dataimporthandler-4.7.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/solr-dataimporthandler-extras-4.7.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/solr-solrj-4.4.0.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spatial4j-0.3.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-aop-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-aspects-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-beans-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-context-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-context-support-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-core-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-expression-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-framework-bom-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-instrument-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-instrument-tomcat-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-jdbc-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-jms-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-messaging-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-orm-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-oxm-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-test-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-tx-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-web-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-webmvc-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-webmvc-portlet-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/spring-websocket-4.0.0.RELEASE.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/standard.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/TaxCodeAssignmentService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/TrilliumService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/UnifiedProfile.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/VIDOrchestration.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/VidPopulateHfdService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/VIDSMultiple.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/VINPrefillService.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/WorkbinProducerCodes.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/wsdl4j-1.6.2.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/xalan.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/xarcrules.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/xdb.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/xmlparserv2-distilled-9i.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/XmlSchema-1.4.3.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/xsom.jar" />
+			<pathelement path="${temp.dir}/WEB-INF/lib/zookeeper-3.4.5.jar" />
+		</path>
+		
+		<manifestclasspath property="jar.classpath" jarfile="${temp.dir}/WEB-INF/lib/classPathLib.jar">
+			<classpath refid="abc.classpath" />
+		</manifestclasspath>
+	</target>-->
+	
+	
+	<!-- This copies all of the property/configuration files -->
+	<target name="Tomcat_Delta_Properties" depends="compile, stagepropertyfiles">
+		<copy todir="${deployRoot_Tomcat}" verbose="true">
+			<fileset dir="${temp.dir}">
+				<include name="**/*.properties"/>
+				<include name="**/productDatabase.xml" />
+				<include name="**/web.xml" />
+				<include name="**/weblogic.xml" />
+			</fileset>
+		</copy>
+		<antcall target="clean_temp_dir" />
+	</target>
+
+	<!-- This only copies the xml files for the LOBs, no configuration xml files -->
+	<target name="Tomcat_Delta_XML" depends="compile, stagexmlfiles">
+		<copy todir="${deployRoot_Tomcat}" verbose="true">
+			<fileset dir="${temp.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.xsd"/>
+				<exclude name="**/web.xml" />
+				<exclude name="**/productDatabase.xml" />
+				<exclude name="**/weblogic.xml" />
+			</fileset>
+		</copy>
+		<antcall target="clean_temp_dir" />
+	</target>	
+	
+	<target name="Tomcat_Full_Build" depends="-resolve, Tomcat_Local_Build">
+	</target>
+
+	<target name="Tomcat_Local_Build" depends="clean, prepare, compile, stagewebfiles, stagepropertyfiles, stageclasses, stagelibs">
+		<echo message="deployRoot is ${deployRoot_Tomcat}" />
+		<echo message="BUILD_ID ${implementationversion}" />
+		<echo message="BUILD_DATE ${buildDate}" />
+		<echo message="deployRoot is ${deployRoot_Tomcat}" />
+
+		<delete dir="${deployRoot_Tomcat}" />
+
+		<copy todir="${deployRoot_Tomcat}" verbose="true">
+			<fileset dir="${temp.dir}">
+				<!-- Note we do property files separately to insert the buildId stuff -->
+				<!-- exclude name="**/*.properties"/ -->
+			</fileset>
+		</copy>
+		<antcall target="clean_temp_dir" />
+		
+	</target>
+
+	<target name="Tomcat_Delta_Build" depends="stagewebfiles">
+		<copy todir="${deployRoot_Tomcat}" verbose="true">
+			<fileset dir="${temp.dir}">
+				<!-- Note we do property files separately to insert the buildId stuff -->
+				<!-- exclude name="**/*.properties"/ -->
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="clean_temp_dir">
+		<echo>Cleaning temp directories for build .... BEGIN</echo>
+		<delete dir="${temp.dir}"/>
+		<echo>Cleaning temp directories for build .... END</echo>
+	</target>
+	
+	<target name="Tomcat_Delta_Classes" depends="versioncheck, compile, stageclasses">
+		<copy todir="${deployRoot_Tomcat}/WEB-INF/classes" verbose="true">
+			<fileset dir="${temp.web.classes.dir}">
+				<include name="**/*.class"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="Tomcat_Delta_JSP" depends="versioncheck, stagewebfiles">
+		<copy todir="${deployRoot_Tomcat}" verbose="${verbose}">
+			<fileset dir="${temp.dir}">
+				<include name="**/*.jsp"/>
+				<include name="**/*.css"/>
+			</fileset>
+		</copy>					
+	</target>
+	<!-- PMD implementation Start -->
+			<target name="pmd" depends="init" unless="sdf_build">
+
+					<cs:retrieve server="${codestation}"
+					              authToken="Guest-Auth"
+					              basedir="${reports.dir}"
+					              project="CodeAnalysis" workflow="autobuild"
+					              status="released"
+					              setName="Base Artifacts"
+					              noCheckCertificate="true"
+					              noCache="false"
+					              suppressBoms="true"
+					              verbose="false"
+					              />
+
+					<property name="pmd.level" value="3"/>
+					<ant antfile="pmdreport.xml" dir="${reports.dir}/PMD" inheritall="false">
+						<property name="pmd.project.name" value="${ant.project.name}"/>
+						<property name="pmd.src.dir" value="${basedir}/src"/>
+						<property name="pmd.level" value="${pmd.level}"/>
+					</ant>
+
+			</target>
+			<!-- PMD implementation End-->
+			
+			<target name="init">
+					<tstamp>
+						<format property="BuildTime" pattern="yyyy.MM.dd'_at_'HH:mm:ss"/>
+					</tstamp>
+					<property name="init.executed" value="true" />
+
+					<echo message="Using JDK          : ${java.version} for this build ...." />
+					<echo message="basedir            : ${basedir}" />
+					<echo message="ant.file           : ${ant.file}" />
+					<echo message="ant.version        : ${ant.version}" />
+					<echo message="ant.project.name   : ${ant.project.name}" />
+					<echo message="ant.java.version   : ${ant.java.version}" />
+
+					<property name="project.root.dir" location="${basedir}" />
+					<property name="echo.metadata" value="false" />
+			</target>
+	
+			<target name="autotest"		depends="cobertura"       	    description="to perform any post build tests from AHP"/>
+	
+			<target name="cobertura">
+				<antcall target="cobertura.batch" />
+			</target>
+	
+			<target name="cobertura.batch" depends="init-cobertura, cobertura-instrument, junit-test" description="Generate Cobertura reports">
+				<antcall target="cobertura.report" />
+			</target>
+	
+			<target name="clean-cobertura" description="Clean the Cobertura directories">
+				<delete dir="${cobertura.reports.dir}" quiet="true" failonerror="off" />
+			</target>
+
+			<target name="init-cobertura" depends="clean-cobertura">
+				<mkdir dir="${cobertura.reports.dir}" />
+				<mkdir dir="${cobertura.instrument.classes.dir}" />
+			</target>
+	
+			<path id="cobertura.classpath">
+				<fileset dir="${lib.dir}"> 
+					<include name="**/*.jar"/>
+				</fileset>				
+				<pathelement location="${junit.classes.dir}" />
+										    
+			</path>
+		
+			<target name="cobertura-instrument" description="Generate Cobertura instrument classes">
+				<taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
+				<cobertura-instrument datafile="${cobertura.ser}" todir="${cobertura.instrument.classes.dir}" ignoreTrivial="true">
+					<classpath>
+						<fileset dir="${lib.dir}">
+							<include name="**/*.jar"/>
+						</fileset>
+					</classpath>
+					<fileset dir="${basedir}/classes">
+						<include name="**/*.class" />
+						<exclude name="**/*Test.class" />
+					</fileset>
+				</cobertura-instrument>
+			</target>
+	
+			<target name="junit-test" depends="clean-junit">
+				<javac srcdir="${junit.test.dir}" destdir="${junit.classes.dir}" debug="true">					
+					<classpath>
+						<fileset dir="${lib.dir}"> 
+							<include name="**/*.jar"/>
+						</fileset>
+						<pathelement location="${weblogic.dir}/${weblogic-api.file}" />
+						<pathelement location="${basedir}/classes"/>
+					</classpath> 
+					<exclude name="**/PropRatingConnectorTest.*" /> 
+					<exclude name="**/MiddleMarketAVSUploadDataManagerTest.*" /> 
+				</javac>
+			
+				<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+					<classpath>
+						<fileset dir="${lib.dir}"> 
+							<include name="**/*.jar"/>
+						</fileset>
+							<pathelement location="${junit.classes.dir}"/>
+						</classpath>
+				</taskdef>
+		
+				<junit printsummary="yes" showoutput="yes" haltonfailure="no" fork="true">
+					<sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.ser}"/>
+					<classpath location="${cobertura.instrument.classes.dir}" />
+					<classpath>
+						<fileset dir="${lib.dir}"> 
+							<include name="**/*.jar"/>
+						</fileset>
+						<pathelement location="${junit.classes.dir}" />
+						<pathelement location="${basedir}/classes"/>
+					</classpath>
+		
+					<formatter type="xml" usefile="true" />
+					<batchtest fork="yes" todir="${junit.reports.xml.dir}">
+						<fileset dir="${junit.test.dir}">
+							<include name="**/*Test.java" />
+						</fileset>
+					</batchtest>
+					
+	
+				</junit>
+				<antcall target="junit.report" />
+			</target>
+
+			<target name="clean-junit" description="Clean the JUnit directories">
+				<delete dir="${junit.reports.dir}" />
+				<mkdir dir="${junit.reports.dir}" />
+				<mkdir dir="${junit.reports.xml.dir}" />
+				<mkdir dir="${junit.reports.html.dir}" />
+				<delete dir="${junit.classes.dir}" />
+				<mkdir dir="${junit.classes.dir}" />
+			</target>
+				
+			<target name="junit.report" description="Generate JUnit reports">
+				<junitreport todir="${junit.reports.xml.dir}">
+					<fileset dir="${junit.reports.xml.dir}">
+							<include name="TEST-*.xml" />
+					</fileset>
+					<report format="frames" todir="${junit.reports.dir}" />
+				</junitreport>
+				<!-- xml format file will not be displayed under Reports/AutoTest_Results in AHP,instead 
+							 TESTS-TestSuites.xml file will be directly published under Tests tab of AHP -->
+							<!-- copy junit reports to test/output/JUnit folder to publish unit test reports in Tests tab of AHP-->
+				<copy todir="${junit.reports.dir}">
+					<fileset dir="${junit.reports.xml.dir}">
+						<include name="TESTS-*.xml" />
+					</fileset>
+				</copy>
+			</target>
+	
+			<target name="cobertura.report" description="Generate Cobertura reports">
+				<cobertura-report format="html" datafile="${cobertura.ser}" srcdir="${basedir}/src" destdir="${cobertura.coverage.html.dir}" />
+				<!-- xml format file will not be displayed under Reports/Cobertura_Coverage_Results in AHP,instead 
+							 coverage.xml file will be directly published under Coverage tab of AHP -->
+				<cobertura-report format="xml"  datafile="${cobertura.ser}" srcdir="${basedir}/src" destdir="${cobertura.reports.dir}" />
+			</target>
+		
+
+</project>
