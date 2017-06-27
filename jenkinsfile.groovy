@@ -3,8 +3,8 @@ node {
 	stage('Build') {
 		
 echo 'Validating JDK...'
-		echo 'Path is ' echo %PATH%
-		echo 'JAVA_HOME is ' echo %JAVA_HOME%
+		echo 'Path is %PATH%'
+		echo 'JAVA_HOME is %JAVA_HOME%'
 		bat 'javac -version'
 
 		echo 'Building...'
