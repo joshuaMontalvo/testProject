@@ -4,7 +4,7 @@ node {
 	
 echo 'Building...'
 
-	sh 'make'
+	bat 'javac HelloWorld.java'
 	archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
    
 	stage 'Deploy'
@@ -19,6 +19,6 @@ echo 'Building...'
    
 		}
    
-	sh 'make publish'
+	bat 'java HelloWorld'
 
 }
