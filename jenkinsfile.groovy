@@ -4,6 +4,7 @@ node {
 		
 echo 'Building...'
 
+		bat 'set path=C:\Program Files (x86)\Java\jdk1.8.0_131\bin'
 		bat 'javac HelloWorld.java'
 	}
 	stage('Deploy')
