@@ -10,7 +10,7 @@ echo 'Building...'
  {  
 		echo 'Deploying...'
 		bat 'java HelloWorld'
-		echo 'I'll be so happy once I see this...'
+		echo 'Ill be so happy once I see this...'
 	
 	}
 }
