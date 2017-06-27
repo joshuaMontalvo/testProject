@@ -1,16 +1,24 @@
-pipeline {
-	agent any 
+node {
+   
+	stage 'Build'
+	
+echo 'Building...'
 
-	stages {
-		stage('Build') {
-			steps {
-				echo 'Building...'
-			}
+	sh 'make'
+	archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+   
+	stage 'Deploy'
+   
+		when {
+       
+			expession {
+           
+				currentBuild.result == null || currentBuild.result == 'SUCCESS'
+       
+				}
+   
 		}
-		stage('Deploy') {
-			steps {
-				echo 'Deploying...'
-			}
-		}
-	}
+   
+	sh 'make publish'
+
 }
