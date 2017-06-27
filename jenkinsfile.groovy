@@ -4,12 +4,10 @@ node {
 		
 echo 'Building...'
 
-		bat 'cd C:\Users\joshua.montalvo\OneDrive - Accenture\Documents\testProject'
-		bat 'javac HelloWorld.java'
+		echo 'I am a donkey'
 	}
 	stage('Deploy')
  {  
-		bat 'java HelloWorld'
-
+		echo 'Such a stupid donkey'	
 	}
 }
