@@ -1,27 +1,12 @@
-pipeline {
-	agent any
-		node {
+node {
    
-			stage 'Build'
-			
+	stage 'Build'
+	
 echo 'Building...'
 
-			bat 'javac HelloWorld.java'
-			archiveArtifacts artifacts: 'C:\Program Files (x86)\Jenkins\workspace\${jar.dir}\HelloWorld.jar, fingerprint: true
+	bat 'javac HelloWorld.java'
+	stage 'Deploy'
    
-			stage 'Deploy'
-   
-			when {
-       
-					expession {
-           
-						currentBuild.result == null || currentBuild.result == 'SUCCESS'
-       
-						}
-   
-				}
-   
-			bat 'java HelloWorld'
+	bat 'java HelloWorld'
 
-		}
 }
