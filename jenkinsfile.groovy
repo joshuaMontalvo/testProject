@@ -7,7 +7,7 @@ echo 'Validating JDK...'
 		bat 'javac -version'
 
 		echo 'Building...'
-		bat 'javac C:/Users/joshua.montalvo/OneDrive - Accenture/Documents/testProject/HelloWorld.java'
+		bat 'javac C:/testProject/HelloWorld.java'
 	}
 	stage('Deploy')
  {  
