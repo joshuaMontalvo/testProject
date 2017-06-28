@@ -12,7 +12,7 @@ echo 'Validating JDK...'
 	stage('Deploy')
  {  
 		echo 'Deploying...'
-		bat 'java HelloWorld'
+		bat 'java C:/testProject/HelloWorld'
 		echo 'Ill be so happy once I see this...'
 	
 	}
