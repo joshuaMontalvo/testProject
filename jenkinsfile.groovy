@@ -19,7 +19,7 @@ echo 'Validating JDK...'
 			echo %CLASSPATH%
 		'''
 		echo 'Deploying...'
-		bat 'java HelloWorld'
+		bat 'java -classpath C:/testProject HelloWorld'
 		echo 'Ill be so happy once I see this...'
 	
 	}
