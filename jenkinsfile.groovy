@@ -1,3 +1,5 @@
+#!/usr/bin/env groovy
+
 node {
    
 	stage('Build') {
@@ -9,7 +11,7 @@ echo 'Validating JDK...'
 		echo 'Building...'
 		bat 'javac C:/testProject/HelloWorld.java'
 	}
-	stage('Deploy')
+	stage('\u2622 Deploy')
  {  
 		echo 'Deploying...'
 		bat 'java C:/testProject/HelloWorld'
