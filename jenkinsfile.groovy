@@ -12,12 +12,21 @@ echo 'Validating JDK...'
 
 		echo 'Building...'
 		bat 'javac C:/testProject/HelloWorld.java'
+
 	}
 	stage('\u2622 Deploy')
  {  
+
 		echo 'Deploying...'
 		bat 'java -classpath C:/testProject HelloWorld'
 		echo 'Ill be so happy once I see this...'
+
 	
+	}
+	stage('Archive') {
+
+		echo 'Archiving Artifacts...'
+		archiveArtifacts 'HelloWorld.jar'			
+
 	}
 }
