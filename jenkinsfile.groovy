@@ -14,8 +14,10 @@ echo 'Validating JDK...'
 	stage('\u2622 Deploy')
  {  
 		echo 'Validating CLASSPATH'
-		bat 'echo %PATH%'
-		bat 'echo %CLASSPATH%'
+		bat '''
+			echo %PATH%
+			echo %CLASSPATH%
+		'''
 		echo 'Deploying...'
 		bat 'java HelloWorld'
 		echo 'Ill be so happy once I see this...'
