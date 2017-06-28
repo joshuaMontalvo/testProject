@@ -15,6 +15,7 @@ echo 'Validating JDK...'
  {  
 		echo 'Validating CLASSPATH'
 		bat 'echo %CLASSPATH%'
+		echo %CLASSPATH%
 		echo 'Deploying...'
 		bat 'java HelloWorld'
 		echo 'Ill be so happy once I see this...'
