@@ -9,12 +9,14 @@ echo 'Validating JDK...'
 		bat 'javac -version'
 
 		echo 'Building...'
-		bat 'javac C:/testProject/HelloWorld.java'
+		bat 'javac C:/Users/joshua.montalvo/OneDrive - Accenture/Documents/testProject/HelloWorld.java'
 	}
 	stage('\u2622 Deploy')
  {  
+		echo 'Validating CLASSPATH'
+		bat 'echo %CLASSPATH%'
 		echo 'Deploying...'
-		bat 'java C:/testProject/HelloWorld'
+		bat 'java HelloWorld'
 		echo 'Ill be so happy once I see this...'
 	
 	}
