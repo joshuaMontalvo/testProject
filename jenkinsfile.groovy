@@ -20,11 +20,12 @@ node {
 
 		echo 'Archiving Artifacts...'
 		
-		nexusArtifactUploader {
+		nexusArtifactUploader
 
 			artifacts: {
 				[
 				artifactId: 'HelloWorld',
+				classifier: '',
 				file: 'HelloWorld.jar',
 				type: 'jar'
 				]
@@ -36,7 +37,7 @@ node {
 			protocol: 'http'
 			repository: 'Test Repository'
 			version: '2.14.4-03'
-		}	
+		
 
 	}
 
