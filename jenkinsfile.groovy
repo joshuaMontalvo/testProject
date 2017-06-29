@@ -26,7 +26,30 @@ echo 'Validating JDK...'
 	stage('Archive') {
 
 		echo 'Archiving Artifacts...'
-		archiveArtifacts 'HelloWorld.jar'			
+		when {
+			expression {
+				currentBuild.result == null || currentBuild.result == 'SUCCESS'
+				}
+		}
+		steps {
+			nexusArtifactUploader {
+				artifacts: {
+					{
+					artifactId: 'HelloWorld', 
+					classifier: 'debug', 
+					file: 'HelloWorld.jar', 
+					type: 'jar'
+					}
+				}, 
+				credentialsId: 'nexusAdmin', 
+				groupId: 'pipelineTest', 
+				nexusUrl: 'localhost:8081/nexus', 
+				nexusVersion: 'nexus2', 
+				protocol: 'http', 
+				repository: 'Test Repository', 
+				version: '2.14.4-03'
+			}
+		}			
 
 	}
 }
