@@ -61,5 +61,5 @@ echo 'Validating JDK...'
 		
 					
 
-	}
+	} 
 }
