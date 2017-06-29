@@ -45,18 +45,17 @@ echo 'Validating JDK...'
 
 			 artifacts: {
 				[
-				artifactId: 'HelloWorld', 
-				classifier: 'debug', 
-				file: 'HelloWorld.jar', 
+				artifactId: 'HelloWorld'
+				file: 'HelloWorld.jar'
 				type: 'jar'
 				]
-			},
-			credentialsId: 'nexusAdmin', 
-			groupId: 'pipelineTest', 
-			nexusUrl: 'localhost:8081/nexus', 
-			nexusVersion: 'nexus2', 
-			protocol: 'http', 
-			repository: 'Test Repository', 
+			}
+			credentialsId: 'nexusAdmin'
+			groupId: 'pipelineTest'
+			nexusUrl: 'localhost:8081/nexus'
+			nexusVersion: 'nexus2'
+			protocol: 'http'
+			repository: 'Test Repository'
 			version: '2.14.4-03'
 		
 					
