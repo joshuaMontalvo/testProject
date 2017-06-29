@@ -24,7 +24,7 @@ node {
 
 			artifacts: {
 				[
-				artifactId: 'HelloWorld'
+				artifactId: 'HelloWorld',
 				file: 'HelloWorld.jar'
 				type: 'jar'
 				]
