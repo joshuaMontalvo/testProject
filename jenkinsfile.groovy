@@ -20,7 +20,7 @@ node {
 
 		echo 'Archiving Artifacts...'
 		
-		nexusArtifactUploader
+		nexusArtifactUploader {
 
 			artifacts: {
 				[
@@ -35,7 +35,8 @@ node {
 			nexusVersion: 'nexus2'
 			protocol: 'http'
 			repository: 'Test Repository'
-			version: '2.14.4-03'	
+			version: '2.14.4-03'
+		}	
 
 	}
 
