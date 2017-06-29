@@ -50,7 +50,7 @@ echo 'Validating JDK...'
 				file: 'HelloWorld.jar', 
 				type: 'jar'
 				]
-			}, 
+			}
 			credentialsId: 'nexusAdmin', 
 			groupId: 'pipelineTest', 
 			nexusUrl: 'localhost:8081/nexus', 
