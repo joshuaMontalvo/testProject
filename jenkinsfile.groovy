@@ -28,18 +28,18 @@ echo 'Validating JDK...'
 	
 		
 		nexusArtifactUploader {
-			nexusVersion('nexus2')
-			protocol('http')
-			nexusUrl('localhost:8081/nexus')
-			groupId('pipelineTest')
-			version('2.14.4-03')
-			repository('Test Repository')
-			credentialsId('nexusAdmin')
+			nexusVersion: 'nexus2'
+			protocol: 'http'
+			nexusUrl: 'localhost:8081/nexus'
+			groupId: 'pipelineTest'
+			version: '2.14.4-03'
+			repository: 'Test Repository'
+			credentialsId: 'nexusAdmin'
 			artifact {
-				artifactId('HelloWorld')
-				type('jar')
+				artifactId: 'HelloWorld'
+				type: 'jar'
 				// classifier('')
-				file('HelloWorld.jar')	
+				file: 'HelloWorld.jar'	
 			}
 
 			/* artifacts: {
