@@ -8,14 +8,14 @@ node {
 	stage('Build') {
 
 		echo 'Building...'
-		echo "Using ${projectType}"
+		echo "Using ${vars.projectType}"
 		bat 'javac C:/testProject/HelloWorld.java'
 
 	}
 
 	stage('Deploy') {
 
-		echo "Deploying ${projectName}..."
+		echo "Deploying ${vars.projectName}..."
 		bat 'java -classpath C:/testProject HelloWorld'
 
 	}
