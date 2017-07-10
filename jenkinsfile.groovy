@@ -6,7 +6,7 @@ pipeline {
 
 	environment {
 		
-		def vars = [projectName:'Test Pipeline',
+		vars = [projectName:'Test Pipeline',
 			projectType:'JDK']
 	
 	}
@@ -14,18 +14,18 @@ pipeline {
 	stages {
 
 		stage('Build') {
-
-			echo 'Building...'
-			echo "Using ${vars.projectType}"
-			bat 'javac C:/testProject/HelloWorld.java'
-
+			steps {
+				echo 'Building...'
+				echo "Using ${vars.projectType}"
+				bat 'javac C:/testProject/HelloWorld.java'
+			}
 		}
 
 		stage('Deploy') {
-
-			echo "Deploying ${vars.projectName}..."
-			bat 'java -classpath C:/testProject HelloWorld'
-
+			steps {
+				echo "Deploying ${vars.projectName}..."
+				bat 'java -classpath C:/testProject HelloWorld'
+			}
 		}
 	
 	}
