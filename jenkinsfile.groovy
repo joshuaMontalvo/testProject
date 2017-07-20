@@ -7,9 +7,10 @@ node {
 timestamps {
  	stage('Build') {
   
- 
+ 		steps {
  		echo "Using ${vars.projectType}"
   		bat 'javac C:/testProject/HelloWorld.java'
+		}
   
   	}
   
