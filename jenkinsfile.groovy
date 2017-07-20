@@ -4,7 +4,7 @@ node {
 
 	def vars = [projectName:'Test Pipeline',
 		projectType:'JDK']	
-
+timestamps {
  	stage('Build') {
   
  
@@ -19,5 +19,5 @@ node {
   		bat 'java -classpath C:/testProject HelloWorld'
   
   	}
-
+}
 }
